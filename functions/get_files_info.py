@@ -17,7 +17,7 @@ def get_files_info(working_directory, directory="."):
     for name in contents:
         size = os.path.getsize(os.path.join(abs_target_directory, name))
         is_dir = os.path.isdir(os.path.join(abs_target_directory, name))
-        content_details += (f"- {name}: file_size:{size} bytes, is_dir:{is_dir}\n")
+        content_details += (f"- {name}: file_size={size} bytes, is_dir={is_dir}\n")
     return content_details
 
     
