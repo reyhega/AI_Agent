@@ -10,14 +10,21 @@ def get_files_info(working_directory, directory="."):
     if not os.path.isdir(abs_target_directory):
         return f'Error: "{directory}" is not a directory'
     
-    contents = os.listdir(abs_target_directory)
 
-    content_details = ""
+    try:
+        files_info = []
+        for filename in os.listdir(abs_target_directory):
+            filepath = os.path.join(abs_target_directory, filename)
+            file_size = 0
+            is_dir = os.path.isdir(filepath)
+            file_size = os.path.getsize(filepath)
+            files_info.append(
+                f"- {filename}: file_size={file_size} bytes, is_dir={is_dir}\n"
+            )
+        return "\n".join(files_info)
+    except Exception as e:
+        return f"Error listing files: {e}"
 
-    for name in contents:
-        size = os.path.getsize(os.path.join(abs_target_directory, name))
-        is_dir = os.path.isdir(os.path.join(abs_target_directory, name))
-        content_details += (f"- {name}: file_size={size} bytes, is_dir={is_dir}\n")
-    return content_details
+    
 
     
