@@ -12,6 +12,7 @@ def get_files_info(working_directory, directory="."):
     
 
     try:
+
         files_info = []
         for filename in os.listdir(abs_target_directory):
             filepath = os.path.join(abs_target_directory, filename)
@@ -22,6 +23,7 @@ def get_files_info(working_directory, directory="."):
                 f"- {filename}: file_size={file_size} bytes, is_dir={is_dir}\n"
             )
         return "\n".join(files_info)
+    
     except Exception as e:
         return f"Error listing files: {e}"
 
