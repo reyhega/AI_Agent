@@ -6,6 +6,7 @@ from google.genai import types
 
 from prompts import system_prompt
 from call_function import *
+from config import *
 
 
 def main():
@@ -35,7 +36,24 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages, verbose)
+    iterations = 0
+
+    while True:
+        iterations += 1
+        if iterations > MAX_ITERATIONS:
+            print(f"Maximum iterations ({MAX_ITERATIONS}) reached.")
+            sys.exit(1)
+
+        try:
+            final_response = generate_content(client, messages, verbose)
+            if final_response:
+                print("Final response:")
+                print(final_response)
+                break
+        except Exception as e:
+            print(f"Error in generate_content: {e}")
+
+    
 
 def generate_content(client, messages, verbose):
     response = client.models.generate_content(
@@ -45,6 +63,14 @@ def generate_content(client, messages, verbose):
             tools=[available_functions], system_instruction=system_prompt
         ),
     )
+
+    if verbose:
+        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+    if response.candidates:
+        for candidate in response.candidates:
+            messages.append(candidate.content)
 
     if not response.function_calls:
         return response.text
@@ -64,9 +90,9 @@ def generate_content(client, messages, verbose):
     if not function_responses:
         raise Exception("no function responses generated, exiting.")
     
-    if verbose:
-        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+    
+
+    messages.append(types.Content(parts=function_responses, role= "User"))
         
     
 if __name__ == "__main__":
